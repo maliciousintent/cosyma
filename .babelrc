@@ -1,0 +1,15 @@
+{
+  "plugins": [
+    "transform-runtime",
+    "syntax-object-rest-spread",
+    ["typecheck", {
+      "disable": {
+        "production": true
+      }
+    }]
+  ],
+  "presets": [
+    "stage-0",
+    "es2015",
+  ]
+}
