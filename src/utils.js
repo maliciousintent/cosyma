@@ -5,15 +5,13 @@ import logger from 'loglevel';
 export const log = logger.getLogger('cognitoSyncManager');
 log.setDefaultLevel('WARN');
 
-export type AnySerializableValue = Object|string|boolean|number;
-
 export let client;
 
-export function serialize(value: AnySerializableValue): string {
+export function serialize(value): string {
   return JSON.stringify(value);
 }
 
-export function deserialize(value: ?string): ?AnySerializableValue {
+export function deserialize(value: ?string) {
   if (typeof value === 'undefined') {
     return undefined;
   }

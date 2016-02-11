@@ -3,5 +3,7 @@
   "extends": "airbnb/base",
   "plugins": [
   ],
-  "rules": {}
+  "rules": {
+    "no-console": [2],
+  }
 }
