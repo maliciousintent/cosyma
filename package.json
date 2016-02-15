@@ -1,6 +1,6 @@
 {
   "name": "cosyma",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "JS Cognito Sync Manager",
   "main": "index.js",
   "scripts": {
@@ -30,6 +30,5 @@
     "loglevel": "^1.4.0",
     "tape": "^4.4.0"
   },
-  "dependencies": {
-  }
+  "dependencies": {}
 }
