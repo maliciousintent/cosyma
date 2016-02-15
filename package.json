@@ -1,6 +1,6 @@
 {
   "name": "cosyma",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "JS Cognito Sync Manager",
   "main": "index.js",
   "scripts": {
