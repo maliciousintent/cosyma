@@ -72,6 +72,8 @@ async function listRecords(datasetName: string): Array {
 }
 
 export const shouldSync = (datasetName: string) => {
+  log.info(DATASET_JOURNAL, DATASET_SYNC_STATUS, datasetName);
+  log.info(DATASET_JOURNAL[datasetName], DATASET_JOURNAL[datasetName].length);
   if (!DATASET_JOURNAL[datasetName] ||
     DATASET_JOURNAL[datasetName].length === 0 ||
     DATASET_SYNC_STATUS[datasetName] === true) {
@@ -92,7 +94,17 @@ async function updateRecords(datasetName: string) {
     RecordPatches: DATASET_JOURNAL[datasetName],
   };
 
-  const response = await client.updateRecords(params);
+  log.info('Dataset journal before updateRecords', [...DATASET_JOURNAL]);
+
+  let response;
+  try {
+    response = await client.updateRecords(params);
+  } catch (updateErr) {
+    log.error('Error updating with params', params);
+    log.error('Error client.updateRecords', updateErr.message, updateErr.stack);
+  }
+
+  log.info('response from client.updatedRecords', response);
   syncCount = syncCount + 1;
   log.warn(`syncCount is ${syncCount}`);
 
@@ -171,9 +183,12 @@ function setValue(datasetName: string, key: string, value: ?any) {
   }
 
   log.info('Writing to journal', updateOp);
+
+  DATASET_JOURNAL[datasetName] = DATASET_JOURNAL[datasetName]
+    .filter(item => item.Key !== updateOp.Key);
   DATASET_JOURNAL[datasetName].push(updateOp);
 
-  DATASETS[datasetName] = DATASETS[datasetName].filter(d => d.Key !== key);
+  DATASETS[datasetName] = DATASETS[datasetName].filter(item => item.Key !== updateOp.Key);
   DATASETS[datasetName] = [...DATASETS[datasetName], {
     Key: key,
     Value: serialize(value),
@@ -194,6 +209,8 @@ async function sync(datasetName: string) {
     IdentityId: AWS.config.credentials.identityId,
     IdentityPoolId: IDENTITY_POOL_ID,
   };
+
+  log.info('cognito params:', params);
 
   cacheStore({ DATASETS, DATASET_JOURNAL });
 
