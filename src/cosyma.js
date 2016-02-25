@@ -21,6 +21,7 @@ import {
 let syncCount = 0;
 let DATASETS = {};
 let DATASET_JOURNAL = {};
+const DATASET_SYNC_STATUS = {};
 const SYNC_SESSION_TOKEN = {};
 let IDENTITY_POOL_ID;
 
@@ -70,13 +71,19 @@ async function listRecords(datasetName: string): Array {
   return results;
 }
 
-
-async function updateRecords(datasetName: string) {
-  if (!DATASET_JOURNAL[datasetName] || DATASET_JOURNAL[datasetName].length === 0) {
+export const shouldSync = (datasetName: string) => {
+  if (!DATASET_JOURNAL[datasetName] ||
+    DATASET_JOURNAL[datasetName].length === 0 ||
+    DATASET_SYNC_STATUS[datasetName] === true) {
     log.info('Nothing to sync, journal is empty');
-    return;
+    return false;
   }
 
+  return true;
+};
+
+
+async function updateRecords(datasetName: string) {
   const params = {
     DatasetName: datasetName,
     IdentityId: AWS.config.credentials.identityId,
@@ -173,7 +180,6 @@ function setValue(datasetName: string, key: string, value: ?any) {
   }];
 }
 
-
 async function sync(datasetName: string) {
   if (!AWS.config.credentials) {
     throw new Error(`Cannot sync '${datasetName}' because AWS is not initialized yet`);
@@ -191,10 +197,15 @@ async function sync(datasetName: string) {
 
   cacheStore({ DATASETS, DATASET_JOURNAL });
 
+  DATASET_SYNC_STATUS[datasetName] = true;
   const response = await client.listRecords(params);
   SYNC_SESSION_TOKEN[datasetName] = response.SyncSessionToken;
 
-  return updateRecords(datasetName);
+  const result = updateRecords(datasetName);
+
+  DATASET_SYNC_STATUS[datasetName] = false;
+
+  return result;
 }
 
 

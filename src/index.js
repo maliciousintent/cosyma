@@ -7,4 +7,5 @@ export {
   sync,
   store,
   restore,
+  shouldSync,
 } from './cosyma';
