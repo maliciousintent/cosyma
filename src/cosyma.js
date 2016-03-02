@@ -234,6 +234,7 @@ async function init(args : {
     roleArn:string,
     identityPoolId:string,
     datasetsToSync:string[],
+    onSTSAssumeRoleFailed:Function,
   }) {
   const {
     identityId,
@@ -242,6 +243,7 @@ async function init(args : {
     roleArn,
     identityPoolId,
     datasetsToSync,
+    onSTSAssumeRoleFailed,
   } = args;
 
   const sts = new AWS.STS();
@@ -292,7 +294,11 @@ async function init(args : {
     } catch (stsError) {
       log.error(`Error while initializing syncClient. STS Token might be expired.
         Error '${stsError.name}': '${stsError.message}'.`);
-      throw stsError;
+      if (onSTSAssumeRoleFailed && typeof onSTSAssumeRoleFailed === 'function') {
+        onSTSAssumeRoleFailed(stsError);
+      } else {
+        throw stsError;
+      }
     }
   }
 }
