@@ -234,7 +234,7 @@ async function init(args : {
     roleArn:string,
     identityPoolId:string,
     datasetsToSync:string[],
-    onSTSAssumeRoleFailed:Function,
+    onSTSAssumeRoleFailed:?Function,
   }) {
   const {
     identityId,
